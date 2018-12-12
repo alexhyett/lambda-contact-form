@@ -77,7 +77,7 @@ namespace ContactForm
             }
 
             Log.CloseAndFlush();
-            return new { location = "https://www.alexhyett.com" };
+            return new { location = _appSettings.ReturnUrl };
         }
 
         private void ConfigureServices(IServiceCollection serviceCollection)
