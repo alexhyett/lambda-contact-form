@@ -11,6 +11,7 @@ using ContactForm.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Serilog;
@@ -31,7 +32,8 @@ namespace ContactForm
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns>string</returns>
-        public string FunctionHandler(ContactRequest input, ILambdaContext context)
+        [LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+        public object FunctionHandler(ContactRequest input, ILambdaContext context)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -58,7 +60,7 @@ namespace ContactForm
             appService.Run(input).GetAwaiter().GetResult();
 
             Log.CloseAndFlush();
-            return "OK";
+            return new { location = "https://www.alexhyett.com" };
         }
 
         private void ConfigureServices(IServiceCollection serviceCollection)
