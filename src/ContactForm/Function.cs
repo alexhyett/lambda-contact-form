@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Serilog;
+using Serilog.Context;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly : LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -51,13 +52,29 @@ namespace ContactForm
                 .Destructure.AsScalar<JArray>()
                 .CreateLogger();
 
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
+            try
+            {
+                var serviceCollection = new ServiceCollection();
+                ConfigureServices(serviceCollection);
 
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var appService = serviceProvider.GetService<App>();
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+                var appService = serviceProvider.GetService<App>();
 
-            appService.Run(input).GetAwaiter().GetResult();
+                appService.Run(input).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                using(LogContext.PushProperty("Name", input.Email))
+                using(LogContext.PushProperty("Email", input.Email))
+                using(LogContext.PushProperty("Phone", input.Phone))
+                using(LogContext.PushProperty("Website", input.Website))
+                using(LogContext.PushProperty("Body", input.Body))
+                {
+                    _logger.Error(ex, "Error sending email from contact form");
+                }
+
+                throw;
+            }
 
             Log.CloseAndFlush();
             return new { location = "https://www.alexhyett.com" };

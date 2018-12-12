@@ -10,6 +10,9 @@ using MimeKit;
 using MimeKit.Text;
 
 using Serilog;
+using Serilog.Context;
+
+using SerilogTimings.Extensions;
 
 namespace ContactForm
 {
@@ -31,6 +34,14 @@ namespace ContactForm
 
         public async Task Run(ContactRequest input)
         {
+            using(LogContext.PushProperty("Email", input.Email))
+            using(LogContext.PushProperty("Phone", input.Phone))
+            using(LogContext.PushProperty("Website", input.Website))
+            using(LogContext.PushProperty("Body", input.Body))
+            {
+                _logger.Information("Contact Message Received from {Name}", input.Name);
+            }
+
             var emailBody = new StringBuilder();
             emailBody.AppendLine($"Name: {input.Name}");
             emailBody.AppendLine($"Email: {input.Email}");
@@ -38,7 +49,10 @@ namespace ContactForm
             emailBody.AppendLine($"Website: {input.Website}");
             emailBody.AppendLine($"Message: {input.Body}");
 
-            await SendEmail(emailBody.ToString());
+            using(_logger.TimeOperation("Sending Email"))
+            {
+                await SendEmail(emailBody.ToString());
+            }
         }
 
         public async Task SendEmail(string body)
