@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="PreserveNewest"/>
+    <None Include="appsettings.local.json" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 </Project>

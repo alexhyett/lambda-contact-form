@@ -12,5 +12,5 @@ This function is based off of my [lamda-dotnet-console](https://github.com/hyett
 
 ```
 cd src/ContactForm
-dotnet lambda deploy-function
+dotnet lambda deploy-function ContactForm
 ```

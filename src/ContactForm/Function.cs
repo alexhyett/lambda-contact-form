@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
 
+using ContactForm.Models;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,11 +31,12 @@ namespace ContactForm
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns>string</returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public string FunctionHandler(ContactRequest input, ILambdaContext context)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional : false, reloadOnChange : true)
+                .AddJsonFile("appsettings.local.json", optional : true, reloadOnChange : true)
                 .AddEnvironmentVariables(prefix: "LAMBDA_")
                 .Build();
 
@@ -50,9 +53,12 @@ namespace ContactForm
             ConfigureServices(serviceCollection);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var result = serviceProvider.GetService<App>().Run(input);
+            var appService = serviceProvider.GetService<App>();
+
+            appService.Run(input).GetAwaiter().GetResult();
+
             Log.CloseAndFlush();
-            return result;
+            return "OK";
         }
 
         private void ConfigureServices(IServiceCollection serviceCollection)

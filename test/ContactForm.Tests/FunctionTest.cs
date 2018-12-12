@@ -7,6 +7,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.TestUtilities;
 
 using ContactForm;
+using ContactForm.Models;
 
 using Xunit;
 
@@ -15,15 +16,23 @@ namespace ContactForm.Tests
     public class FunctionTest
     {
         [Fact]
-        public void TestToUpperFunction()
+        public void TestOKReturned()
         {
-
-            // Invoke the lambda function and confirm the string was upper cased.
             var function = new Function();
             var context = new TestLambdaContext();
-            var upperCase = function.FunctionHandler("hello world", context);
 
-            Assert.Equal("TestHELLO WORLD", upperCase);
+            var contactRequest = new ContactRequest()
+            {
+                Name = "James Smith",
+                Email = "hello@example.com",
+                Phone = "01234567",
+                Website = "https://www.example.com",
+                Body = "This is a message"
+            };
+
+            var upperCase = function.FunctionHandler(contactRequest, context);
+
+            Assert.Equal("OK", upperCase);
         }
     }
 }
