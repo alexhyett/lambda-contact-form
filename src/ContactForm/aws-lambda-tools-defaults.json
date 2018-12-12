@@ -15,5 +15,5 @@
   "function-runtime": "dotnetcore2.1",
   "function-memory-size": 256,
   "function-timeout": 30,
-  "function-handler": "lambda-dotnet-console::ContactForm.Function::FunctionHandler"
+  "function-handler": "ContactForm::ContactForm.Function::FunctionHandler"
 }
